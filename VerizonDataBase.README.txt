@@ -1,0 +1,44 @@
+Explain time & space complexity for each operation.
+
+Let N = number of rows in the table, and
+    M = number of columns.
+
+
+Time Complexity
+----------------
+(A) "Insert row"
+Since the table is implemented as an ArrayList, it takes O(M) time to add to the ArrayList.
+But we also maintain, for each column, a TreeMap from value to primary keys of the rows the
+value occurs in, for fast SORT (i.e ORDER BY in SQL) and GROUP BY operations. Updating these
+TreeMaps takes O(log(N)) time, so the total complexity is O(M * log(N)).
+
+(B) "Delete Row"
+We do lazy deletion, i.e. just add the row's primary key to a set of deleted keys,
+so it takes O(1) time in the worst case.
+
+(C) "Update Row"
+This also takes O(1) time.
+
+(D) "Get all rows from a table"
+This takes O(N * M) time, since it sequentially scans all rows, each with M columns.
+
+(E) "Get specific count of rows from a table"
+This takes O(L * M) time, where L = count of rows specified.
+
+(F) "SORT by a column, and GET specific count of rows from table"
+We iterate over the values of the column to sort by in sorted order. Since we maintain
+a TreeMap of column values to primary keys, we already have the values in sorted order.
+Hence it takes O(L * M) time where L = number of rows requested.
+
+(G) "GroupBy a column, and GET specific count of rows from table"
+This takes O(K) time where K = number of unique values. The TreeMaps from column values to
+primary keys allows us to do this efficiently.
+
+NOTE: The number of rows in the table N includes lazily deleted rows.
+
+
+Space Complexity
+----------------
+Since we delete rows lazily, we may have more rows than what we would otherwise have.
+If D = number of deleted rows, and R = number of rows still left, we use O((D + R) * M) space.
+We could improve the complexity by periodically deleting the rows marked deleted.
